@@ -11,8 +11,6 @@ dependencies = [
 [project.scripts]
 kickoff = "support_triage.main:kickoff"
 run_crew = "support_triage.main:kickoff"
-plot = "support_triage.main:plot"
-run_with_trigger = "support_triage.main:run_with_trigger"
 
 [build-system]
 requires = ["hatchling"]
@@ -21,3 +19,12 @@ build-backend = "hatchling.build"
 [tool.crewai]
 type = "flow"
 project_id = "b90c643a-1688-4180-b436-ac953df8b6df"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["unittests.py"]

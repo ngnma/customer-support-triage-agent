@@ -1,87 +1,50 @@
 #!/usr/bin/env python
-from pathlib import Path
-
+import sys
 from pydantic import BaseModel
-
 from crewai.flow import Flow, listen, start
-
-from support_triage.crews.content_crew.content_crew import ContentCrew
-
-
-class ContentState(BaseModel):
-    topic: str = "AI Agents"
-    outline: str = ""
-    draft: str = ""
-    final_post: str = ""
+from support_triage.schemas import Ticket
+from support_triage.utils import parse_ticket, TicketParseError
+import argparse
 
 
-class ContentFlow(Flow[ContentState]):
+# logging setup
+import logging
+logger = logging.getLogger(__name__)    # one per file, at the top
+
+
+class TicketState(BaseModel):
+    ticket: Ticket | None = None
+    category: str = ""
+    ticket_path: str = ""
+
+
+class SupportTriageFlow(Flow[TicketState]):
 
     @start()
-    def plan_content(self, crewai_trigger_payload: dict = None):
-        print("Planning content")
-
-        if crewai_trigger_payload:
-            self.state.topic = crewai_trigger_payload.get("topic", self.state.topic)
-            print(f"Using trigger payload: {crewai_trigger_payload}")
-
-        print(f"Topic: {self.state.topic}")
-
-    @listen(plan_content)
-    def generate_content(self):
-        print(f"Generating content on: {self.state.topic}")
-        result = (
-            ContentCrew()
-            .crew()
-            .kickoff(inputs={"topic": self.state.topic})
-        )
-
-        print("Content generated")
-        self.state.final_post = result.raw
-
-    @listen(generate_content)
-    def save_content(self):
-        print("Saving content")
-        output_dir = Path("output")
-        output_dir.mkdir(exist_ok=True)
-        with open(output_dir / "post.md", "w") as f:
-            f.write(self.state.final_post)
-        print("Post saved to output/post.md")
-        return self.state.final_post
+    def load_ticket(self):
+        """Entry point for the flow"""
+        ticket = parse_ticket(self.state.ticket_path)
+        self.state.ticket = ticket
+        logger.info("Ticket loaded from user input. Ticket ID: %s", ticket.ticket_id)
 
 
-def kickoff():
-    content_flow = ContentFlow()
-    content_flow.kickoff()
 
+def kickoff() -> None:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+    )
 
-def plot():
-    content_flow = ContentFlow()
-    content_flow.plot()
+    parser = argparse.ArgumentParser(description="Run the support triage flow on one ticket.")
+    parser.add_argument("ticket_path", help="Path to the ticket JSON file")
+    args = parser.parse_args()
 
-
-def run_with_trigger():
-    """
-    Run the flow with trigger payload.
-    """
-    import json
-    import sys
-
-    if len(sys.argv) < 2:
-        raise Exception("No trigger payload provided. Please provide JSON payload as argument.")
-
+    support_flow = SupportTriageFlow()
     try:
-        trigger_payload = json.loads(sys.argv[1])
-    except json.JSONDecodeError:
-        raise Exception("Invalid JSON payload provided as argument")
-
-    content_flow = ContentFlow()
-
-    try:
-        # Not returned: this is a console script, and a non-None return exits 1.
-        content_flow.kickoff({"crewai_trigger_payload": trigger_payload})
-    except Exception as e:
-        raise Exception(f"An error occurred while running the flow with trigger: {e}")
+        support_flow.kickoff(inputs={"ticket_path": args.ticket_path})
+    except TicketParseError as e:
+        logger.error("Invalid ticket: %s", e)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
