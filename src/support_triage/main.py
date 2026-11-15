@@ -26,19 +26,23 @@ class SupportTriageFlow(Flow[TicketState]):
         ticket = parse_ticket(self.state.ticket_path)
         self.state.ticket = ticket
         logger.info("Ticket loaded from user input. Ticket ID: %s", ticket.ticket_id)
+        logger.info("Ticket loaded from user input. Ticket content: %s", ticket.content) # TODO: Remove this line in PII protection phase, as it may contain sensitive information
 
 
 
 def kickoff() -> None:
+    # logging setup
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     )
 
+    # Input from command line arguments
     parser = argparse.ArgumentParser(description="Run the support triage flow on one ticket.")
     parser.add_argument("ticket_path", help="Path to the ticket JSON file")
     args = parser.parse_args()
 
+    # Initialize the flow with the input arguments
     support_flow = SupportTriageFlow()
     try:
         support_flow.kickoff(inputs={"ticket_path": args.ticket_path})
