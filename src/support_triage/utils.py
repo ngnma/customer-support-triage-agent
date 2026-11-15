@@ -7,6 +7,7 @@ from pydantic import ValidationError
 from support_triage.schemas import Ticket
 
 
+
 class TicketParseError(Exception):
     """Raised when a ticket file cannot be turned into a valid Ticket."""
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 from pydantic import BaseModel
-from crewai.flow import Flow, listen, start
+from crewai.flow import Flow, listen, start, persist
 from support_triage.schemas import Ticket
 from support_triage.utils import parse_ticket, TicketParseError
 import argparse
@@ -16,17 +16,24 @@ class TicketState(BaseModel):
     ticket: Ticket | None = None
     category: str = ""
     ticket_path: str = ""
+    status: str = "new"
 
-
+@persist()
 class SupportTriageFlow(Flow[TicketState]):
 
     @start()
     def load_ticket(self):
         """Entry point for the flow"""
-        ticket = parse_ticket(self.state.ticket_path)
-        self.state.ticket = ticket
-        logger.info("Ticket loaded from user input. Ticket ID: %s", ticket.ticket_id)
-        logger.info("Ticket loaded from user input. Ticket content: %s", ticket.content) # TODO: Remove this line in PII protection phase, as it may contain sensitive information
+        print("Ticket UUID:", self.state.id)
+        if self.state.status == "new":
+            print("This is a new ticket. Loading ticket from user input.")
+            self.state.ticket = parse_ticket(self.state.ticket_path)
+            self.state.status = "open"
+            # logger.info("Ticket loaded from user input. Ticket ID: %s", ticket.ticket_id)
+            logger.info("Ticket loaded from user input. Ticket content: %s", self.state.ticket.content) # TODO: Remove this line in PII protection phase, as it may contain sensitive information
+        elif self.state.status == "open":
+            print("This is an open ticket. Loading ticket from memory.")
+            logger.info("Ticket loaded from memory. Ticket content: %s", self.state.ticket.content) # TODO: Remove this line in PII protection phase, as it may contain sensitive information
 
 
 
@@ -45,7 +52,13 @@ def kickoff() -> None:
     # Initialize the flow with the input arguments
     support_flow = SupportTriageFlow()
     try:
-        support_flow.kickoff(inputs={"ticket_path": args.ticket_path})
+        support_flow.kickoff(
+            inputs={
+                "ticket_path": args.ticket_path
+                , "id": "f410cd58-4cdb-4052-8e30-f1455047610e" # Tip: It updates the state of the flow with the given ID, if it exists.
+            }
+            #, restore_from_state_id='f410cd58-4cdb-4052-8e30-f1455047610e' # Tip: It forks the existing flow's state from the given ID, and creates a new flow with a new ID. This keep records of all changes.
+            )
     except TicketParseError as e:
         logger.error("Invalid ticket: %s", e)
         sys.exit(1)
