@@ -29,10 +29,11 @@ class SupportTriageFlow(Flow[TicketState]):
             print("This is a new ticket. Loading ticket from user input.")
             self.state.ticket = parse_ticket(self.state.ticket_path)
             self.state.status = "open"
-            # logger.info("Ticket loaded from user input. Ticket ID: %s", ticket.ticket_id)
+            logger.info("Ticket loaded from user input. Ticket number: %s", self.state.ticket.ticket_number)
             logger.info("Ticket loaded from user input. Ticket content: %s", self.state.ticket.content) # TODO: Remove this line in PII protection phase, as it may contain sensitive information
         elif self.state.status == "open":
             print("This is an open ticket. Loading ticket from memory.")
+            logger.info("Ticket loaded from memory. Ticket number: %s", self.state.ticket.ticket_number)
             logger.info("Ticket loaded from memory. Ticket content: %s", self.state.ticket.content) # TODO: Remove this line in PII protection phase, as it may contain sensitive information
 
 
@@ -55,9 +56,9 @@ def kickoff() -> None:
         support_flow.kickoff(
             inputs={
                 "ticket_path": args.ticket_path
-                , "id": "f410cd58-4cdb-4052-8e30-f1455047610e" # Tip: It updates the state of the flow with the given ID, if it exists.
+                , "id": "accfd40e-6435-4759-9ec8-b998cb373e75" # Tip: It updates the state of the flow with the given ID, if it exists.
             }
-            #, restore_from_state_id='f410cd58-4cdb-4052-8e30-f1455047610e' # Tip: It forks the existing flow's state from the given ID, and creates a new flow with a new ID. This keep records of all changes.
+            #, restore_from_state_id='accfd40e-6435-4759-9ec8-b998cb373e75' # Tip: It forks the existing flow's state from the given ID, and creates a new flow with a new ID. This keep records of all changes.
             )
     except TicketParseError as e:
         logger.error("Invalid ticket: %s", e)
