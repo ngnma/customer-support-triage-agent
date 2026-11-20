@@ -11,6 +11,7 @@ dependencies = [
 [project.scripts]
 kickoff = "support_triage.main:kickoff"
 run_crew = "support_triage.main:kickoff"
+plot = "support_triage.main:plot"
 
 [build-system]
 requires = ["hatchling"]

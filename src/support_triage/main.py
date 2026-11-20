@@ -79,6 +79,9 @@ class SupportTriageFlow(Flow[TicketState]):
             logger.error("Invalid category decision: %s", decision)
             raise ValueError(f"Invalid category decision: {decision}")
 
+def plot():
+    flow = SupportTriageFlow()  # Replace with your actual Flow class name
+    flow.plot()
 
 def kickoff() -> None:
     # logging setup
