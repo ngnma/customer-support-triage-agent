@@ -9,6 +9,7 @@ from crewai.flow import Flow, listen, start, persist, router, or_
 from support_triage.schemas import Ticket
 from support_triage.utils import parse_ticket, TicketParseError
 from support_triage.prompts import ROUTER_PROMPT
+from support_triage.crews.support_crew.support_crew import SupportCrew
 
 
 

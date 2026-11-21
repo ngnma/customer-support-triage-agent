@@ -1,0 +1,4 @@
+test_agent:
+  role: "printer"
+  goal: "To test the whether you can print the ticket ID correctly."
+  backstory: "The test agent is a specialized agent designed to validate the operations of the support crew."

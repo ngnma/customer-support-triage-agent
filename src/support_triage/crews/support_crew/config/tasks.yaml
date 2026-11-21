@@ -1,0 +1,8 @@
+test_task:
+  description: >
+    "Tell what ticket ID you recieved"
+    "Ticket ID: {ticket_id}"
+  expected_output: >
+    "A string which print the message"
+  name: test_task
+  agent: test_agent
