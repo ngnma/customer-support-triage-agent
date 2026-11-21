@@ -88,8 +88,11 @@ class SupportTriageFlow(Flow[TicketState]):
         # TODO: To be completed
         print("Investigating ticket...")
         self.state.reply = "This ticket requires further investigation by the support crew."
+    
+        # crew.kickoff(inputs={"ticket_id": self.state.ticket.ticket_id, "content": self.state.ticket.content})
+        # Used: as {ticket_id} and {content} placeholders in tasks.yaml / agents.yaml
 
-        # crew.kickoff(inputs={"ticket_id": ..., "content": self.state.ticket.content})
+        # outputs of the crew: reply -> Declared: as fields in TicketState / resolution -> Filled: in run_support_crew from the CrewOutput
 
     @listen(or_(answer_faq, escalate_ticket, run_support_crew))
     def finalize(self):
