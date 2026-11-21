@@ -89,6 +89,8 @@ class SupportTriageFlow(Flow[TicketState]):
         print("Investigating ticket...")
         self.state.reply = "This ticket requires further investigation by the support crew."
 
+        # crew.kickoff(inputs={"ticket_id": ..., "content": self.state.ticket.content})
+
     @listen(or_(answer_faq, escalate_ticket, run_support_crew))
     def finalize(self):
         print("Finalizing ticket processing...")
