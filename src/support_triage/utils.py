@@ -1,5 +1,4 @@
 import json
-import zlib
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -36,7 +35,7 @@ def parse_ticket(path: str | Path) -> Ticket:
 
     try:
         return Ticket(
-            ticket_number=zlib.crc32(str(path).encode("utf-8")),
+            ticket_id=raw.get("ticket_id"),
             content=raw.get("content"),
         )
     except ValidationError as e:

@@ -10,7 +10,7 @@ def test_parse_ticket_valid(tmp_path):
     # Arrange: build the input. tmp_path is a fresh temp folder pytest gives you.
     ticket_file = tmp_path / "ticket.json"
     ticket_file.write_text(
-        json.dumps({"content": "My order hasn't arrived."}),
+        json.dumps({"ticket_id": "TCK-0001", "content": "My order hasn't arrived."}),
         encoding="utf-8",
     )
 
@@ -19,4 +19,5 @@ def test_parse_ticket_valid(tmp_path):
 
     # Assert: check the result matches what you expect.
     assert isinstance(ticket, Ticket)
+    assert ticket.ticket_id == "TCK-0001"
     assert ticket.content == "My order hasn't arrived."

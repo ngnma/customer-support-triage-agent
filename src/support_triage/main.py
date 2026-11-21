@@ -37,11 +37,11 @@ class SupportTriageFlow(Flow[TicketState]):
             print("This is a new ticket. Loading ticket from user input.")
             self.state.ticket = parse_ticket(self.state.ticket_path)
             self.state.status = "open"
-            logger.info("Ticket loaded from user input. Ticket number: %s", self.state.ticket.ticket_number)
+            logger.info("Ticket loaded from user input. Ticket ID: %s", self.state.ticket.ticket_id)
             logger.info("Ticket loaded from user input. Ticket content: %s", self.state.ticket.content) # TODO: Remove this line in PII protection phase, as it may contain sensitive information
         elif self.state.status == "open":
             print("This is an open ticket. Loading ticket from memory.")
-            logger.info("Ticket loaded from memory. Ticket number: %s", self.state.ticket.ticket_number)
+            logger.info("Ticket loaded from memory. Ticket ID: %s", self.state.ticket.ticket_id)
             logger.info("Ticket loaded from memory. Ticket content: %s", self.state.ticket.content) # TODO: Remove this line in PII protection phase, as it may contain sensitive information
 
 
@@ -95,10 +95,10 @@ class SupportTriageFlow(Flow[TicketState]):
     def finalize(self):
         print("Finalizing ticket processing...")
         print("Ticket UUID:", self.state.id)
-        print("Ticket number:", self.state.ticket.ticket_number)
+        print("Ticket ID:", self.state.ticket.ticket_id)
         print("Ticket category:", self.state.category)
         print("Ticket reply:", self.state.reply)
-        logger.info("Ticket processing finalized. Ticket UUID: %s, Ticket number: %s, Category: %s", self.state.id, self.state.ticket.ticket_number, self.state.category)
+        logger.info("Ticket processing finalized. Ticket UUID: %s, Ticket ID: %s, Category: %s", self.state.id, self.state.ticket.ticket_id, self.state.category)
         # TODO: summary
 
 
